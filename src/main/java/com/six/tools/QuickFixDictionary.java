@@ -12,8 +12,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -26,6 +28,18 @@ public class QuickFixDictionary {
         this.format = format;
 
         loadAllFields();
+    }
+
+    public final String fixFormat() {
+        return format.displayName();
+    }
+
+    public List<String> fieldNames() {
+        return fields.stream().map(FixField::name).collect(Collectors.toList());
+    }
+
+    public List<FixField> fields() {
+        return new ArrayList<>(fields);
     }
 
     private void loadAllFields() {

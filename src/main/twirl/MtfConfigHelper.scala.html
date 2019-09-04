@@ -1,4 +1,4 @@
-@(fields: List[String])
+@(fields: java.util.Map[String, java.util.List[com.six.tools.FixField]], versions: java.util.List[String])
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,13 +6,95 @@
         <title>MTF Config Helper</title>
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
-        <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
 
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
-        <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/popper.js@@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/bootstrap-material-design@@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+
+        <script>
+            const fieldMap = {
+                @for(entry <- fields.entrySet) {
+                    "@{entry.getKey()}": [
+                    @for(field <- entry.getValue()) {
+                        { "tag": "@{field.tag()}", "name": "@{field.name()}" },
+                    }
+                    ],
+                }
+            };
+        </script>
     </head>
     <body>
+        <div class="container">
+            <div class="row mt-2"><h1>MTF Config Helper</h1></div>
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <select name="fix-version" class="custom-select" id="fix-standard">
+                        @for(version <- versions) {
+                            <option @if(version.contains("4.2")) { selected } >@version</option>
+                        }
+                        </select>
+                    </div>
+                    <div class="form-group ml-3">
+                        <input class="form-control" placeholder="LUD">
+                    </div>
+                    <div class="form-group ml-3">
+                        <input class="form-control" placeholder="MIC">
+                    </div>
+                    <div class="form-group ml-3">
+                        <input class="form-control" placeholder="File Format">
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Tag</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Offset</th>
+                            <th scope="col">Length</th>
+                            <th scope="col">Format</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" id="field-tag"><input class="form-control" type="text" placeholder="Tag" id="tag-input"></th>
+                            <th><input class="form-control" type="text" placeholder="Name" id="name-input"></th>
+                            <th><input class="form-control" type="text" placeholder="Offset" id="offset-input"></th>
+                            <th><input class="form-control" type="text" placeholder="Length" id="length-input"></th>
+                            <th><input class="form-control" type="text" placeholder="Format" id="format-input"></th>
+                            <th><button class="btn btn-primary btn-raised">+</button></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
+        <script>
+            $('#tag-input').keydown(() => {
+                setTimeout(() => {
+                    const content = $('#tag-input').val();
+                    if(!content) {
+                        return;
+                    }
+
+                    const tagId = parseInt(content);
+                    if(isNaN(tagId)) {
+                        return;
+                    }
+
+                    const standard = fieldMap[$('#fix-standard').val()];
+                    if(!standard) {
+                        return;
+                    }
+
+                    const tags = standard.filter(elem => elem.tag.startsWith(content));
+                    console.log("tag", tagId, "=>", tags);
+                }, 10)
+            })
+        </script>
     </body>
 </html>

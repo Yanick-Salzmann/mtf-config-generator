@@ -1,11 +1,19 @@
 package com.six.tools;
 
-import lombok.Value;
-import lombok.experimental.Accessors;
-
-@Value
-@Accessors(fluent = true)
 public class FixField {
     private final int tag;
     private final String name;
+
+    public FixField(int tag, String name) {
+        this.tag = tag;
+        this.name = name;
+    }
+
+    public int tag() {
+        return tag;
+    }
+
+    public String name() {
+        return name;
+    }
 }
